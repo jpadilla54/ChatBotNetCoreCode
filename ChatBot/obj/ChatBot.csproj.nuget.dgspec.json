@@ -1,28 +1,30 @@
 {
   "format": 1,
   "restore": {
-    "/home/joel_padilla54/ChatBotNetCoreCode/ChatBot/ChatBot.csproj": {}
+    "C:\\Users\\Joel Padilla\\Source\\Repos\\jpadilla54\\ChatBotNetCoreCode\\ChatBot\\ChatBot.csproj": {}
   },
   "projects": {
-    "/home/joel_padilla54/ChatBotNetCoreCode/ChatBot/ChatBot.csproj": {
+    "C:\\Users\\Joel Padilla\\Source\\Repos\\jpadilla54\\ChatBotNetCoreCode\\ChatBot\\ChatBot.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/joel_padilla54/ChatBotNetCoreCode/ChatBot/ChatBot.csproj",
+        "projectUniqueName": "C:\\Users\\Joel Padilla\\Source\\Repos\\jpadilla54\\ChatBotNetCoreCode\\ChatBot\\ChatBot.csproj",
         "projectName": "ChatBot",
-        "projectPath": "/home/joel_padilla54/ChatBotNetCoreCode/ChatBot/ChatBot.csproj",
-        "packagesPath": "/home/joel_padilla54/.nuget/packages/",
-        "outputPath": "/home/joel_padilla54/ChatBotNetCoreCode/ChatBot/obj/",
+        "projectPath": "C:\\Users\\Joel Padilla\\Source\\Repos\\jpadilla54\\ChatBotNetCoreCode\\ChatBot\\ChatBot.csproj",
+        "packagesPath": "C:\\Users\\Joel Padilla\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Joel Padilla\\Source\\Repos\\jpadilla54\\ChatBotNetCoreCode\\ChatBot\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "/usr/share/dotnet/sdk/NuGetFallbackFolder"
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "/home/joel_padilla54/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\Joel Padilla\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "netcoreapp2.1"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -55,6 +57,7 @@
               "version": "[2.1.2, )"
             },
             "Microsoft.NETCore.App": {
+              "suppressParent": "All",
               "target": "Package",
               "version": "[2.1.0, )",
               "autoReferenced": true

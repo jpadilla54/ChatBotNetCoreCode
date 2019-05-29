@@ -20,24 +20,6 @@ namespace ChatBot.Controllers
             return View();
         }
 
-        public IActionResult About()
-        {
-            ViewData["Message"] = "Your application description page.";
-
-            return View();
-        }
-
-        public IActionResult Contact()
-        {
-            ViewData["Message"] = "Your contact page.";
-
-            return View();
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
@@ -45,8 +27,8 @@ namespace ChatBot.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        private string fbToken = "EAAItAL3k9J0BAHcPmPzKUC0eaupNAB7hnBTZBiG3b0HM5fxbYmquSkxvjNmm6YZBhN3QRvBLupzJcIDNRza0hPPZC9xiuSCg94zBjZCWZAukZA9oJRmLnBxoMQUNuUHeWdZBhJpLX5hBHgwwfKvfR9LU6GcrrGQfkQS29EiZCVBrbdeKS23S4RSH";
-        private string postUrl = "https://graph.facebook.com/v2.6/me/messages";
+        private string fbToken = "EAAItAL3k9J0BAEZCN1BLwwo2YC7KhA6cXZC8nZBfMOvMvZCfpJ4tqwzr8RfZCNZB2dZBvwk1lE1SPLsNVtOrNaFgXnXRgZBqrPtnookjU6L5X9C1wHUbZAZBZAcauG0hWGbKf9UIVQ51oZA4eSZCfxC0n9foUFnKjHAVoy59Vr1kaYg4ZC3pZAbeNZAykzMy";
+        private string postUrl = "https://graph.facebook.com/v2.8/me/messages";
 
         [HttpGet]
         public string Webhook(
@@ -54,7 +36,7 @@ namespace ChatBot.Controllers
             [FromQuery(Name = "hub.challenge")] string challenge,
             [FromQuery(Name = "hub.verify_token")] string verify_token)
         {
-            var json = Request.Query;
+            //var json = Request.Query;
 
             if (verify_token.Equals("my_token_is_great"))
             {
