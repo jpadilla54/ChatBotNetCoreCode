@@ -27,7 +27,7 @@ namespace ChatBot.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        private string fbToken = "EAAItAL3k9J0BAEZCN1BLwwo2YC7KhA6cXZC8nZBfMOvMvZCfpJ4tqwzr8RfZCNZB2dZBvwk1lE1SPLsNVtOrNaFgXnXRgZBqrPtnookjU6L5X9C1wHUbZAZBZAcauG0hWGbKf9UIVQ51oZA4eSZCfxC0n9foUFnKjHAVoy59Vr1kaYg4ZC3pZAbeNZAykzMy";
+        private string fbToken = "EAAItAL3k9J0BAGFmfo5jcDVcaTZAZBUPP4vWXz1Nd5jwy1yH5dI9iLRm2xR9RlrOs4sIs5TjFYUr2ie2KZBphZB3wRIqfXXJhwLrqP1bJ2rxI9f924HGAaFJ8vSTBf18cFJalesQxcMk93SS8mKxs2f0ZCoR0tnaW0wRd73RArRXoRvjq5KOk";
         private string postUrl = "https://graph.facebook.com/v2.8/me/messages";
 
         [HttpGet]
@@ -71,19 +71,30 @@ namespace ChatBot.Controllers
         {
             //Post to ApiAi
             string messageTextAnswer = postApiAi(messageText);
+
+            //descomponer el var para sacar los actions o el speech
+
+
             string postParameters = string.Format("access_token={0}&recipient={1}&message={2}", fbToken, "{ id:" + recipientId + "}", "{ text:\"" + messageTextAnswer + "\"}");
+            
             //Response from ApiAI or answer to FB question from user post it to   FB back.
             var client = new HttpClient();
             client.PostAsync(postUrl, new StringContent(postParameters, Encoding.UTF8, "application/json"));
         }
 
         private string apiAiToken = "836a19f128b74dda831caed476073a8d";
+
         public String postApiAi(string messageText)
         {
             var config = new AIConfiguration(apiAiToken,
-                                             SupportedLanguage.English);
+                                             SupportedLanguage.Spanish);
             ApiAi apiAi = new ApiAi(config);
             var response = apiAi.TextRequest(messageText);
+            
+            
+            //var d = response.Result.Action;
+            //var e = response.Result.Parameters;
+
             return response.Result.Fulfillment.Speech;
         }
     }
