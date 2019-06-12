@@ -32,26 +32,12 @@ namespace ChatBot
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddCors(options =>
-            {
-                options.AddPolicy("AllowMyOrigin",
-                builder => builder.WithOrigins("*"));
-            });
-
-            
-            services.AddMvc();
-            services.Configure<MvcOptions>(options =>
-            {
-                options.Filters.Add(new CorsAuthorizationFilterFactory("AllowMyOrigin"));
-            });
-
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            app.UseCors("AllowMyOrigin");
 
             if (env.IsDevelopment())
             {
@@ -66,6 +52,13 @@ namespace ChatBot
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
+
+            app.UseCors(builder =>
+            {
+                builder.WithOrigins("*");
+                builder.AllowAnyMethod();
+                builder.AllowAnyHeader();
+            });
 
             app.UseMvc(routes =>
             {
