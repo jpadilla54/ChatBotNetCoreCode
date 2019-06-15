@@ -11,6 +11,7 @@ using System.Text;
 using System.Net.Http;
 using System.IO;
 using Newtonsoft.Json;
+using Nancy.Json;
 
 namespace ChatBot.Controllers
 {
@@ -38,9 +39,6 @@ namespace ChatBot.Controllers
             [FromQuery(Name = "hub.challenge")] string challenge,
             [FromQuery(Name = "hub.verify_token")] string verify_token)
         {
-            //esta variable la use para ver que manda el webhook de messenger para verificar el token
-            //var json = Request.Query;
-
             if (verify_token.Equals("my_token_is_great"))
             {
                 return challenge;
@@ -70,132 +68,109 @@ namespace ChatBot.Controllers
             }
         }
 
-        //metodo de prueba para emular mensajes de facebook pero en local
-        //se consulta asi en el url /Home/Intent
-        public void Intent()
-        {
-            string text = "crear tutoria para mate discretas el lunes a las 4 pm";
-            postApiAiPrueba(text);
-        }
-
-        public void postApiAiPrueba(string messageText)
-        {
-            //Post to ApiAi
-            AIResponse response = postApiAi(messageText);
-            var action = response.Result.Action;
-            var parameter = response.Result.Parameters;
-            string speech = response.Result.Fulfillment.Speech;
-
-            if (action != "creartutoria" && action!="consultartutoria")
-            {
-                //sino es ningun action significa que debemos enviar la repuesta a messenger
-                string respuestaamessenger = speech;
-            }
-
-            if (action == "creartutoria")
-            {
-                string clases = parameter.Where(p => p.Key == "Clases").FirstOrDefault().Value.ToString();
-                DateTime date = Convert.ToDateTime(parameter.Where(p => p.Key == "time").FirstOrDefault().Value);
-                if (clases == null)
-                {
-                    //mandamos a messenger el text
-                }
-                if (date == null)
-                {
-                    //mandamos a messenger el text
-                }
-
-                //sino mandamos el post a la api de tutorias
-                var datep = date;
-                string f = clases;
-            }
-
-            if (action == "consultartutoria")
-            {
-                string clases = parameter.Where(p => p.Key == "Clases").FirstOrDefault().Value.ToString();
-                DateTime date = Convert.ToDateTime(parameter.Where(p => p.Key == "time").FirstOrDefault().Value);
-                if (clases == null)
-                {
-                    //mandamos a messenger el text
-                }
-                if (date == null)
-                {
-                    //mandamos a messenger el text
-                }
-
-                //sino mandamos el post a la api de tutorias
-
-
-                var datep = date;
-                string f = clases;
-            }
-        }
-
         public void postToFB(string recipientId, string messageText)
         {
-            //Post to ApiAi
             AIResponse response = postApiAi(messageText);
             var action = response.Result.Action;
             var parameter = response.Result.Parameters;
-            string speech = response.Result.Fulfillment.Speech;
             string messageTextAnswer = response.Result.Fulfillment.Speech;
 
 
-            //aqui empezamos a evaluar si viene un action para crear o consultar
-            //se evalua sino es ningun action y se va directo a messenger
             if (action != "creartutoria" && action != "consultartutoria")
             {
-                //Si no es ningun action posible entonces son respuestas a preguntas desde APiAi y se van directo a messenger
-                //Post to messenger
                 EnviarMessenger(recipientId, messageTextAnswer);
             }
 
-            //se evalua si es para crear tutoria
             if (action == "creartutoria")
             {
-                //se lee los parametros del diccionario de paramtros y se asignan a variables
+                if ((parameter.Where(p => p.Key == "Clases").FirstOrDefault().Value.ToString()) == null)
+                {
+                    EnviarMessenger(recipientId, messageTextAnswer);
+                    return;
+                }
+                if ((parameter.Where(p => p.Key == "date").FirstOrDefault().Value) == "")
+                {
+                    EnviarMessenger(recipientId, messageTextAnswer);
+                    return;
+                }
+                if ((parameter.Where(p => p.Key == "time").FirstOrDefault().Value) == "")
+                {
+                    EnviarMessenger(recipientId, messageTextAnswer);
+                    return;
+                }
+
                 string clases = parameter.Where(p => p.Key == "Clases").FirstOrDefault().Value.ToString();
-                DateTime date = Convert.ToDateTime(parameter.Where(p => p.Key == "time").FirstOrDefault().Value);
-                if (clases == null)
+                DateTime date = Convert.ToDateTime(parameter.Where(p => p.Key == "date").FirstOrDefault().Value);
+                DateTime time = Convert.ToDateTime(parameter.Where(p => p.Key == "time").FirstOrDefault().Value);
+                int dia = Convert.ToInt32(date.ToString("dd"));
+                int mes = Convert.ToInt32(date.ToString("MM"));
+                int anio = Convert.ToInt32(date.ToString("yy"));
+                int hora = Convert.ToInt32(time.ToString("hh"));
+                int minutos = Convert.ToInt32(time.ToString("mm"));
+                DateTime fechatutoria = new DateTime(anio, mes, dia, hora, minutos, 0);
+                CrearTutorias creartutoria = new CrearTutorias();
+
+                creartutoria.nombre = recipientId;
+                creartutoria.fecha = fechatutoria;
+                creartutoria.Idclase = 1;
+
+                var client = new HttpClient();
+                string uri = "https://tutoriaswebapp.azurewebsites.net/api/tutoria/AgregarTutoria";
+                var jsonInString = JsonConvert.SerializeObject(creartutoria);
+                try
                 {
-                    //mandamos a messenger el text de que hace falta
-                    EnviarMessenger(recipientId, messageTextAnswer);
+                    client.PostAsync(uri, new StringContent(jsonInString, Encoding.UTF8, "application/json"));
                 }
-                if (date == null)
+                catch (Exception ex)
                 {
-                    //mandamos a messenger el text
-                    EnviarMessenger(recipientId, messageTextAnswer);
+                    EnviarMessenger(recipientId, "Hubo un error al crear la tutoria");
+                    return;
                 }
-
-                //sino mandamos el post a la api de tutorias para crearla con esos parametros
-
-
-
-                //variables para ver que reciben los parametros en breakpoints, no se ocupan
-                var datep = date;
-                string f = clases;
+                EnviarMessenger(recipientId, messageTextAnswer);
             }
 
             if (action == "consultartutoria")
             {
                 string clases = parameter.Where(p => p.Key == "Clases").FirstOrDefault().Value.ToString();
-                DateTime date = Convert.ToDateTime(parameter.Where(p => p.Key == "time").FirstOrDefault().Value);
+                DateTime date = Convert.ToDateTime(parameter.Where(p => p.Key == "date").FirstOrDefault().Value);
+                DateTime time = Convert.ToDateTime(parameter.Where(p => p.Key == "time").FirstOrDefault().Value);
+
+
                 if (clases == null)
                 {
-                    //mandamos a messenger el text
                     EnviarMessenger(recipientId, messageTextAnswer);
                 }
                 if (date == null)
                 {
-                    //mandamos a messenger el text
+                    EnviarMessenger(recipientId, messageTextAnswer);
+                }
+                if (time == null)
+                {
                     EnviarMessenger(recipientId, messageTextAnswer);
                 }
 
-                //sino mandamos a consultar a la api de tutorias
+                int dia = Convert.ToInt32(date.ToString("dd"));
+                int mes = Convert.ToInt32(date.ToString("MM"));
+                int anio = Convert.ToInt32(date.ToString("yy"));
+                int hora = Convert.ToInt32(time.ToString("hh"));
+                int minutos = Convert.ToInt32(time.ToString("mm"));
+
+                DateTime fechatutoria = new DateTime(anio, mes, dia, hora, minutos, 0);
+
+
+                Tutoria tutoria = new Tutoria();
+
+                tutoria.nombre = recipientId;
+                tutoria.fecha = fechatutoria;
+                tutoria.Idclase = 1;
+
+                var client = new HttpClient();
+                string uri = "https://tutoriaswebapp.azurewebsites.net/api/tutoria";
+                var jsonInString = JsonConvert.SerializeObject(tutoria);
+                client.PostAsync(uri, new StringContent(jsonInString, Encoding.UTF8, "application/json"));
 
             }
         }
-
 
         public void EnviarMessenger(string recipientId, string messageTextAnswer)
         {
@@ -216,4 +191,4 @@ namespace ChatBot.Controllers
     }
 }
 
-    
+
